@@ -1,53 +1,50 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <string>
 
 using namespace std;
 
+vector<int> nums(10, 0);
+
+int N;
+int digit;
+
+void byFront(int d);
+
 int main() {
-	int N;
 	cin >> N;
+	digit = to_string(N).size() - 1;
 
-	//N벡터화.
-
-	vector<int> num;
-
-	while (N != 0) {
-		num.push_back(N % 10);
-		N = (int)(N / 10);
+	for (int d = digit; d >= 1; d--) {
+		byFront(d);
 	}
 
-	int digit = (int)(num.size());
+	for (int i = 0; i <= N % 10; i++)
+		nums[i] += 1;
+	if (digit == 0) nums[0] -= 1;
 
-	vector<int> numOf;
-	for (int i = 0; i < 10; i++) numOf.push_back(0);
-
-
-	/*
-	//자리이전
-	numOf[0] += digit * pow(10, digit - 1);
-	for (int i = 0; i < digit; i++) {
-		numOf[0] -= (int)(pow(10, i));
-	}
-
-	numOf[1] += digit * (int)(pow(10, digit - 1));
-	numOf[2] += digit * (int)(pow(10, digit - 1));
-	numOf[3] += digit * (int)(pow(10, digit - 1));
-	numOf[4] += digit * (int)(pow(10, digit - 1));
-	numOf[5] += digit * (int)(pow(10, digit - 1));
-	numOf[6] += digit * (int)(pow(10, digit - 1));
-	numOf[7] += digit * (int)(pow(10, digit - 1));
-	numOf[8] += digit * (int)(pow(10, digit - 1));
-	numOf[9] += digit * (int)(pow(10, digit - 1));
-	*/
-
-	//
-	for (int i = digit; i > 1; i--) {
-		for (int j = 0; j < num[i - 1]; j++) {
-			numOf[num[j]] += (int)(pow(10, ))
-		}
-	}
-
+	for (int i = 0; i < 10; i++)
+		cout << nums[i] << ' ';
 
 	return 0;
+}
+
+void byFront(int d) {
+
+	int n = (int)(N / pow(10, d)) % 10;
+
+	for (int i = 0; i < 10; i++) nums[i] += (n) * (d) * pow(10, d - 1);
+
+	if (d == digit) {
+		string ones = "";
+		for (int i = 0; i < d; i++) ones += '1';
+
+		nums[0] -= stoi(ones);
+	}
+
+	for (int i = 0; i < n; i++) nums[i] += pow(10, d);
+	if (d == digit) nums[0] -= pow(10, d);
+
+	nums[n] += N % (int)(pow(10, d)) + 1;
 }
