@@ -19,7 +19,7 @@ int main() {
 	memo = vector<vector<long long>>(N + 1, vector<long long>(N + 1, -1));
 
 	long long max = possibleNum(0, 0);
-	
+
 	if (K >= max) {
 		cout << -1;
 	}
@@ -27,17 +27,18 @@ int main() {
 		cout << getKth("", 0, 0, K + 1);
 	}
 
-	
+	/*
 	for (int k = 1; k <= pow(2, N); k++) {
 		cout << endl << getKth("", 0, 0, k);
 	}
-	
+	*/
+
 	return 0;
 }
 
 long long possibleNum(long long nL, long long nR) {
 
-	if(nL < nR) return (long long)(pow(2, N - (nL + nR)));
+	if (nL < nR) return (long long)(pow(2, N - (nL + nR)));
 	if (nL > ((double)(N) / 2)) return (long long)(pow(2, N - (nL + nR)));
 
 	if (memo[nL + 1][nR] == -1) memo[nL + 1][nR] = possibleNum(nL + 1, nR);
@@ -59,13 +60,13 @@ string getKth(string cur, long long nL, long long nR, long long K) {
 	}
 
 	long long curPossibleNum;
-	if(ifPossible(cur)) curPossibleNum = (long long)(pow(2, N - (nL + nR)));
+	if (ifPossible(cur)) curPossibleNum = (long long)(pow(2, N - (nL + nR) - 1));
 	else curPossibleNum = possibleNum(nL + 1, nR);
 
-	if (curPossibleNum <= K) {
+	if (curPossibleNum < K) {
 		return getKth(cur + ')', nL, nR + 1, K - curPossibleNum);
 	}
-	else{
+	else {
 		return getKth(cur + '(', nL + 1, nR, K);
 	}
 }
@@ -78,7 +79,7 @@ bool ifPossible(string cur) {
 	for (int i = 0; i < cur.size(); i++) {
 		if (cur[i] == '(') nL++;
 		else nR++;
-		
+
 		if (nL < nR) return true;
 	}
 
