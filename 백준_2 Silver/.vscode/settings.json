@@ -2,7 +2,6 @@
     "files.associations": {
         "set": "cpp",
         "iostream": "cpp",
-        "utility": "cpp",
-        "cmath": "cpp"
+        "utility": "cpp"
     }
 }

@@ -6,6 +6,7 @@
         "list": "cpp",
         "xlocinfo": "cpp",
         "xtree": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "utility": "cpp"
     }
 }
