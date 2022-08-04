@@ -7,6 +7,7 @@
         "xlocinfo": "cpp",
         "xtree": "cpp",
         "xutility": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "queue": "cpp"
     }
 }

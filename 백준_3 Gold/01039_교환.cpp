@@ -1,39 +1,90 @@
 #include <iostream>
+#include <string>
+#include <vector>
 #include <deque>
 
 using namespace std;
 
-int main(){
-    int N, K; 
-    cin >> N >> K;
-    deque<int> num;
-    while(N != 0){
-        num.push_front(N % 10);
-        N /= 10;
-    }
-}
+class node {
+public:
+	string numStr;
+	int st;
+	int swapNum;
 
-void minSwapSortResult(deque<int> arr, int curSortNum, deque<int>& res, int& minSortNum){
-    //맨 앞에올 숫자 -> 가장 큰 숫자 구하기
-    int largest = arr[0];
-    for(int i = 1; i < arr.size(); i++){
-        if(largest < arr[i]) largest = arr[i];
-    }
+	node(string numStrP, int stP, int swapNumP) : numStr(numStrP), st(stP), swapNum(swapNumP) {};
+};
 
+int main() {
 
-    //맨앞 숫자일 경우
-    minSwapSortResult
+	int N, K;
+	cin >> N >> K;
+	string numStr = to_string(N);
 
-    //그 숫자랑 같은 숫자 모두 재귀 돌며 최소 정렬횟수 구하기
-    for(int i = 1; i < arr.size(); i++){
-        if(largest == arr[i]){
-            //swap
+	if (numStr.size() == 1) {
+		cout << -1;
+		return 0;
+	}
+	else if (numStr.size() == 2) {
+		if (numStr[1] == '0') {
+			cout << -1;
+			return 0;
+		}
+		else if (K % 2 != 0) {
+			char temp = numStr[0];
+			numStr[0] = numStr[1];
+			numStr[1] = temp;
+		}
 
-            //재귀
+		cout << numStr;
+		return 0;
+	}
 
-            //swap 원상복구
+	string maxStr = "";
+	for (int i = 0; i < numStr.size(); i++) maxStr += '0';
 
-        }
-    }
+	deque<node> Q;
+	Q.push_back(node(numStr, 0, 0));
+	
+	while (!Q.empty()) {
+		node curNode = Q.front();
+		Q.pop_front();
+		if (curNode.swapNum == K) {
+			if (maxStr.compare(curNode.numStr) < 0) maxStr = curNode.numStr;
+			continue;
+		}
+		if (curNode.st == curNode.numStr.size() - 1) {
+			if ((K - curNode.swapNum) % 2 != 0) {
+				char temp = curNode.numStr[curNode.numStr.size() - 2];
+				curNode.numStr[curNode.numStr.size() - 2] = curNode.numStr[curNode.numStr.size() - 1];
+				curNode.numStr[curNode.numStr.size() - 1] = temp;
+			}
+			if (maxStr.compare(curNode.numStr) < 0) maxStr = curNode.numStr;
+			continue;
+		}
 
+		//가장 큰 수 찾기
+		char maxNum = curNode.numStr[curNode.st];
+		for (int i = curNode.st + 1; i < curNode.numStr.size(); i++)
+			if (maxNum < curNode.numStr[i]) maxNum = curNode.numStr[i];
+
+		//Q에 넣기
+
+		if (curNode.numStr[curNode.st] == maxNum) {
+			Q.push_back(node(curNode.numStr, curNode.st + 1, curNode.swapNum));
+		}
+
+		for (int i = curNode.st + 1; i < curNode.numStr.size(); i++) {
+			if (curNode.numStr[i] == maxNum) {
+				string tempStr = curNode.numStr;
+				char temp = tempStr[curNode.st];
+				tempStr[curNode.st] = tempStr[i];
+				tempStr[i] = temp;
+				Q.push_back(node(tempStr, curNode.st + 1, curNode.swapNum + 1));
+			}
+		}
+	}
+
+	cout << maxStr;
+
+	return 0;
 }
