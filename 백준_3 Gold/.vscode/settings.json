@@ -8,6 +8,7 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "utility": "cpp",
-        "queue": "cpp"
+        "queue": "cpp",
+        "iostream": "cpp"
     }
 }
