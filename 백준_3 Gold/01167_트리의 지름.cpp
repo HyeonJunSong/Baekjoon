@@ -1,18 +1,19 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <set>
 
 using namespace std;
 
 vector<vector<int>> memo;
 vector<map<int, int>> tree;
 int V;
-
-void DFS(map<int, int> byCur, int st, int ed);
+int DFS(int byCur, set<int>& passed, int curNode);
 
 int main() {
     cin >> V;
     tree = vector<map<int, int>>(V, map<int, int>());
+    vector<int> leaves;
     for (int i = 0; i < V; i++) {
         int ver;
         cin >> ver;
@@ -25,15 +26,16 @@ int main() {
             tree[ver].insert(make_pair(target, val));
             cin >> target;
         }
+
+        if(tree[ver].size() == 1) leaves.push_back(ver);
     }
 
-    memo = vector<vector<int>>(V, vector<int>(V, -1));
-
-    int ans = -1;
-    for (int i = 0; i < V; i++) {
-        for (int j = i + 1; j < V; j++) {
-            if (memo[i][j] == -1) DFS(map<int, int>(), i, j);
-            if (ans < memo[i][j]) ans = memo[i][j];
+    int ans = 0;
+    for(int i = 0; i < leaves.size(); i++){
+        for(int j = i + 1; j < leaves.size(); j++){
+            set<int> passed;
+            int ret = DFS(0, passed, leaves[i]);
+            if(ans < ret) ans = ret;
         }
     }
 
@@ -42,21 +44,17 @@ int main() {
     return 0;
 }
 
-void DFS(map<int, int> byCur, int st, int ed) {
-    if (st == ed) return;
+int DFS(int byCur, set<int>& passed, int curNode){
+    int ans = 0;
 
-    for (auto iter = tree[st].begin(); iter != tree[st].end(); iter++) {
-        if (memo[st][iter->first] != -1) continue;
+    if(tree[curNode].size() == 1) return tree[curNode].begin()->second;
 
-        map<int, int> temp = byCur;
-        temp.emplace(iter->first, 0);
-        for (auto iter2 = temp.begin(); iter2 != temp.end(); iter2++) {
-            temp[iter2->first] += iter->second;
-            memo[iter->first][iter2->first] = iter2->second;
-            memo[iter2->first][iter->first] = iter2->second;
-        }
-        DFS(temp, iter->first, ed);
+    passed.insert(curNode);
+    for(auto iter = tree[curNode].begin(); iter != tree[curNode].end(); iter++){
+        if(passed.find(iter->first) != passed.end()) continue;
+        int res = DFS(byCur + iter->second, passed, iter->first);
+        if(res > ans) ans = res;
     }
-
-    return;
+    passed.erase(curNode);
+    return ans;
 }
