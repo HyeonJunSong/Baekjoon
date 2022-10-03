@@ -3,6 +3,7 @@
         "set": "cpp",
         "iostream": "cpp",
         "utility": "cpp",
-        "deque": "cpp"
+        "deque": "cpp",
+        "xstring": "cpp"
     }
 }
