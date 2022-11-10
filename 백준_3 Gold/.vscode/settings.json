@@ -9,6 +9,7 @@
         "xutility": "cpp",
         "utility": "cpp",
         "queue": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "map": "cpp"
     }
 }
