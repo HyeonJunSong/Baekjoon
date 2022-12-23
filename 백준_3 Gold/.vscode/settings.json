@@ -10,6 +10,7 @@
         "utility": "cpp",
         "queue": "cpp",
         "iostream": "cpp",
-        "map": "cpp"
+        "map": "cpp",
+        "cmath": "cpp"
     }
 }
