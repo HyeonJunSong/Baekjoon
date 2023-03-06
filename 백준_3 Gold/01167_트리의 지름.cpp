@@ -1,53 +1,91 @@
+////23 03 06
+//about 1h 20m
+
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include <set>
-#include <map>
 
 using namespace std;
 
-vector<map<int, int>> tree;
+vector<vector<pair<int, int>>> tree;
 
-int main() {
+set<int> parents;
+vector<int> longestTwoBranchSum;
+int getDiameterOfTree();
+int getFarthestBranch(int n);
+
+int main(){
     int V;
     cin >> V;
+    tree = vector<vector<pair<int, int>>>(V + 1, vector<pair<int, int>>());
+    longestTwoBranchSum = vector<int>(V + 1, 0);
 
-    tree = vector<map<int, int>>(V, map<int, int>());
-
-    vector<int> edgeNodes;
-
-
-    for (int i = 0; i < V; i++) {
-        int nodeNum;
-        cin >> nodeNum;
-        nodeNum--;
-
-        int targetNode, edgeVal;
-        cin >> targetNode;
-        targetNode--;
-        while (targetNode != -2) {
-            cin >> edgeVal;
-            tree[nodeNum][targetNode] = edgeVal;
-            cin >> targetNode;
-            targetNode--;
+    int st, ed, w;
+    for(int i = 0; i < V; i++){
+        cin >> st;
+        cin >> ed;
+        while(ed != -1){
+            cin >> w;
+            tree[st].push_back(pair<int, int>(ed, w));
+            cin >> ed;
         }
-        if (tree[nodeNum].size() == 1) edgeNodes.push_back(nodeNum);
     }
 
-    int longest = 0;
 
-    vector<int> maxVals(V, 0);
-
-    vector<int> nextNodes;
-    do{
-        for(int i = 0; i < edgeNodes.size(); i++){
-            maxVals[tree[edgeNodes[i]].begin()->first] = tree[edgeNodes[i]].begin()->second;
-
-        }
-
-    }while(nextNodes.size() != 0);
-
-
-    cout << longest;
-
+    cout << getDiameterOfTree();
     return 0;
+}
+
+//find longest two branches from root
+int getDiameterOfTree(){
+    
+    vector<int> rootBranchLengths;
+    for(auto iter = tree[1].begin(); iter != tree[1].end(); iter++){
+        rootBranchLengths.push_back(getFarthestBranch(iter->first) + iter->second);
+    }
+
+    int ans;
+
+    switch(rootBranchLengths.size()){
+        case 1:
+            ans = rootBranchLengths[0];
+        case 2:
+            ans = rootBranchLengths[0] + rootBranchLengths[1];
+        case 3:
+            sort(rootBranchLengths.begin(), rootBranchLengths.end());
+            ans = *(rootBranchLengths.end() - 1) + *(rootBranchLengths.end() - 2);
+    }
+
+    for(auto iter = longestTwoBranchSum.begin(); iter != longestTwoBranchSum.end(); iter++){
+        if(ans < *iter)
+            ans = *iter;
+    }
+
+    return ans;
+}
+
+int getFarthestBranch(int n){
+   cout << n << ' ';
+    parents.insert(n);
+
+    vector<int> branch;
+    for(auto iter = tree[n].begin(); iter != tree[n].end(); iter++){
+        if(parents.find(iter->first) != parents.end()) continue;
+
+        branch.push_back(getFarthestBranch(iter->first));
+    }
+
+    sort(branch.begin(), branch.end());
+    switch(branch.size()){
+    case 2:
+        longestTwoBranchSum[n] = branch[0] + branch[1];
+        break;
+    case 3:
+        longestTwoBranchSum[n] =  *(branch.end() - 1) + *(branch.end() - 2);
+        break;
+    }
+
+    parents.erase(n);
+    return branch.back();
 }
