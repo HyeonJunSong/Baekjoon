@@ -3,148 +3,218 @@
 
 using namespace std;
 
-int main() {
+#define MAX 987654321
 
+void runCase();
+int getSmallestUnitNum(int, int, int);
+
+int main(){
     int T;
     cin >> T;
-    for (int t = 0; t < T; t++) {
-        int N, W;
-        cin >> N >> W;
-        vector<int> inner(N, 0);
-        vector<int> outer(N, 0);
 
-        for (int i = 0; i < N; i++) cin >> inner[i];
-        for (int i = 0; i < N; i++) cin >> outer[i];
+    for(int t = 0; t < T; t++)
+        runCase();
+    
+    return 0;
+}
 
-        vector<int> innerCnt(N, 0);
-        vector<int> outerCnt(N, 0);
+int N, W;
+vector<pair<int, int>> enemies;
+vector<vector<vector<int>>> cache;
 
-        if (N == 1) {
-            if (inner[0] + outer[0] <= W) {
-                innerCnt[0]++;
-                outerCnt[0]++;
-            }
-        }
-        else if (N == 2) {
-            if (inner[0] + outer[0] <= W) {
-                innerCnt[0]++;
-                outerCnt[0]++;
-            }
-            if (inner[1] + outer[1] <= W) {
-                innerCnt[1]++;
-                outerCnt[1]++;
-            }
-            if (inner[0] + inner[1] <= W) {
-                innerCnt[0]++;
-                innerCnt[1]++;
-            }
-            if (outer[0] + outer[1] <= W) {
-                outerCnt[0]++;
-                outerCnt[1]++;
-            }
+void runCase(){
+    cin >> N >> W;
 
-        }
-        else {
-            for (int i = 0; i < N; i++) {
-                if (inner[i] + inner[(i + 1) % N] <= W) {
-                    innerCnt[i]++;
-                    innerCnt[(i + 1) % N]++;
-                }
+    enemies = vector<pair<int, int>>(N, pair<int, int>());
+    cache = vector<vector<vector<int>>>(4, vector<vector<int>>(N, vector<int>(4, -1)));
 
-                if (inner[i] + outer[i] <= W) {
-                    innerCnt[i]++;
-                    outerCnt[i]++;
-                }
-            }
+    int ans;
 
-            for (int i = 0; i < N; i++) {
-                if (outer[i] + outer[(i + 1) % N] <= W) {
-                    outerCnt[i]++;
-                    outerCnt[(i + 1) % N]++;
-                }
-            }
+    for(int i = 0; i < N; i++)
+        cin >> enemies[i].first;
+    for(int i = 0; i < N; i++)
+        cin >> enemies[i].second;
+    
+    if(N == 1){
+        if(enemies[0].first + enemies[0].second <= W)
+            ans = 1;
+        else
+            ans = 2;
+    }
+    else{
+
+        //마지막 두놈 이어질 수 있는지
+        bool ifLastTwoConnectable = enemies.back().first + enemies.back().second <= W;
+
+        //둘 다 안잇기
+        if(cache[0][0][0] == -1)
+            cache[0][0][0] = getSmallestUnitNum(0, 0, 0);
+
+        ans = cache[0][0][0];
+
+        //위에거만 잇기
+        if(enemies[0].first + enemies.back().first <= W){
+            if(cache[1][0][1] == -1)
+                cache[1][0][1] = getSmallestUnitNum(1, 0, 1);
+            if(ans > cache[1][0][1])
+                ans = cache[1][0][1];
         }
 
-        bool ifChanged = true;
-        while (ifChanged) {
-            ifChanged = false;
-            for (int i = 0; i < N; i++) {
-
-                if (innerCnt[i] == 1) {
-                    int target = W - inner[i];
-                    innerCnt[i] = 4;
-                    if (innerCnt[(i - 1 + N) % N] != 4 && target >= inner[(i - 1 + N) % N]) {
-                        innerCnt[(i - 1 + N) % N] = 4;
-
-                        int target2 = W - inner[(i - 1 + N) % N];
-                        if (innerCnt[(i - 2 + N) % N] != 4 && target2 >= inner[(i - 2 + N) % N]) innerCnt[(i - 2 + N) % N]--;
-                        if (outerCnt[(i - 1 + N) % N] != 4 && target2 >= outer[(i - 1 + N) % N]) outerCnt[(i - 1 + N) % N]--;
-                    }
-                    else if (innerCnt[(i + 1 + N) % N] != 4 && target >= inner[(i + 1 + N) % N]) {
-                        innerCnt[(i + 1 + N) % N] = 4;
-
-                        int target2 = W - inner[(i + 1 + N) % N];
-                        if (innerCnt[(i + 2 + N) % N] != 4 && target2 >= inner[(i + 2 + N) % N]) innerCnt[(i + 2 + N) % N]--;
-                        if (outerCnt[(i + 1 + N) % N] != 4 && target2 >= outer[(i + 1 + N) % N]) outerCnt[(i + 1 + N) % N]--;
-                    }
-                    else if (outerCnt[(i + 0 + N) % N] != 4 && target >= outer[(i + 0 + N) % N]) {
-                        outerCnt[(i + 0 + N) % N] = 4;
-
-                        int target2 = W - outer[(i + 0) % N];
-                        if (outerCnt[(i - 1 + N) % N] != 4 && target2 >= outer[(i - 1 + N) % N]) outerCnt[(i - 1 + N) % N]--;
-                        if (outerCnt[(i + 1 + N) % N] != 4 && target2 >= outer[(i + 1 + N) % N]) outerCnt[(i + 1 + N) % N]--;
-                    }
-
-                    ifChanged = true;
-                }
-
-                if (outerCnt[i] == 1) {
-                    int target = W - outer[i];
-                    outerCnt[i] = 4;
-                    if (outerCnt[(i - 1 + N) % N] != 4 && target >= outer[(i - 1 + N) % N]) {
-                        outerCnt[(i - 1 + N) % N] = 4;
-
-                        int target2 = W - outer[(i - 1 + N) % N];
-                        if (outerCnt[(i - 2 + N) % N] != 4 && target2 >= outer[(i - 2 + N) % N]) outerCnt[(i - 2 + N) % N]--;
-                        if (innerCnt[(i - 1 + N) % N] != 4 && target2 >= inner[(i - 1 + N) % N]) innerCnt[(i - 1 + N) % N]--;
-                    }
-                    else if (outerCnt[(i + 1 + N) % N] != 4 && target >= outer[(i + 1 + N) % N]) {
-                        outerCnt[(i + 1 + N) % N] = 4;
-
-                        int target2 = W - outer[(i + 1) % N];
-                        if (outerCnt[(i + 2 + N) % N] != 4 && target2 >= outer[(i + 2 + N) % N]) outerCnt[(i + 2 + N) % N]--;
-                        if (innerCnt[(i + 1 + N) % N] != 4 && target2 >= inner[(i + 1 + N) % N]) innerCnt[(i + 1 + N) % N]--;
-                    }
-                    else if (innerCnt[(i + 0 + N) % N] != 4 && target >= inner[(i + 0 + N) % N]) {
-                        innerCnt[(i + 0 + N) % N] = 4;
-
-                        int target2 = W - inner[(i + 0) % N];
-                        if (innerCnt[(i - 1 + N) % N] != 4 && target2 >= inner[(i - 1 + N) % N]) innerCnt[(i - 1 + N) % N]--;
-                        if (innerCnt[(i + 1 + N) % N] != 4 && target2 >= inner[(i + 1 + N) % N]) innerCnt[(i + 1 + N) % N]--;
-                    }
-
-                    ifChanged = true;
-                }
-
-
-
-            }
-
+        //밑에거만 잇기
+        if(enemies[0].second + enemies.back().second <= W){
+            if(cache[2][0][2] == -1)
+                cache[2][0][2] = getSmallestUnitNum(2, 0, 2);
+            if(ans > cache[2][0][2])
+                ans = cache[2][0][2];
         }
 
-
-
-        vector<int> totCnt(5, 0);
-        for (int i = 0; i < N; i++) {
-            totCnt[innerCnt[i]]++;
-            totCnt[outerCnt[i]]++;
+        //둘 다 잇기
+        if(enemies[0].first + enemies.back().first <= W
+        && enemies[0].second + enemies.back().second <= W){
+            if(cache[3][0][3] == -1)
+                cache[3][0][3] = getSmallestUnitNum(3, 0, 3);
+            if(ans > cache[3][0][3])
+                ans = cache[3][0][3];
         }
-
-//        for (int i = 0; i < 5; i++) cout << totCnt[i] << ' ';
-//        cout << endl;
-
-        cout << totCnt[0] + totCnt[2] / 2 + totCnt[3] / 2 + totCnt[4] / 2 << endl;
-
     }
 
+    cout << ans << '\n';
+}
+
+//case:
+//0 -> 위에거 밑에거 둘다 가능
+//1 -> 밑에거만 가능
+//2 -> 위에거만 가능
+//3 -> 둘다 불가능
+int getSmallestUnitNum(int firstCase, int i, int curCase){
+
+    //기저
+    if(i == N - 1){
+        switch(curCase){
+        case 0:
+            switch (firstCase){
+            case 0:
+                if(enemies[i].first + enemies[i].second <= W)
+                    return 1;
+                else
+                    return 2;
+
+            case 1:
+            case 2:
+            case 3:
+                return 2;
+            }
+        
+        case 1:
+            switch (firstCase){
+            case 0:
+            case 2:
+                return 1;
+            case 1:
+            case 3:
+                return MAX;
+            }
+
+        case 2:
+            switch (firstCase){
+            case 0:
+            case 1:
+                return 1;
+            case 2:
+            case 3:
+                return MAX;
+            }
+
+        case 3:
+            switch (firstCase){
+            case 0:
+                return 0;
+            case 1:
+            case 2:
+            case 3:
+                return MAX;
+            }
+        }
+    }
+    
+    int ans;
+    switch(curCase){
+        case 0:
+
+            ////둘 다 안 잇기
+            //아래 위 이을 수 있으면 잇기
+            if(cache[firstCase][i + 1][0] == -1)
+                cache[firstCase][i + 1][0] = getSmallestUnitNum(firstCase, i + 1, 0);
+
+            if(enemies[i].first + enemies[i].second <= W)
+                ans = cache[firstCase][i + 1][0] + 1;
+            else
+                ans = cache[firstCase][i + 1][0] + 2;
+
+            ////위에거만 옆에 구역과 이어서 배치
+            if(enemies[i].first + enemies[i + 1].first <= W){
+                if(cache[firstCase][i + 1][1] == -1)
+                    cache[firstCase][i + 1][1] = getSmallestUnitNum(firstCase, i + 1, 1);
+                if(ans > cache[firstCase][i + 1][1] + 2)
+                    ans = cache[firstCase][i + 1][1] + 2;
+            }
+            
+            ////밑에거만 옆에 구역과 이어서 배치
+            if(enemies[i].second + enemies[i + 1].second <= W){
+                if(cache[firstCase][i + 1][2] == -1)
+                    cache[firstCase][i + 1][2] = getSmallestUnitNum(firstCase, i + 1, 2);
+                if(ans > cache[firstCase][i + 1][2] + 2)
+                    ans = cache[firstCase][i + 1][2] + 2;
+            }
+
+            ////둘 다 잇기
+            if(enemies[i].first + enemies[i + 1].first <= W
+            && enemies[i].second + enemies[i + 1].second <= W){
+                if(cache[firstCase][i + 1][3] == -1)
+                    cache[firstCase][i + 1][3] = getSmallestUnitNum(firstCase, i + 1, 3);
+                if(ans > cache[firstCase][i + 1][3] + 2)
+                    ans = cache[firstCase][i + 1][3] + 2;
+            }
+            
+            break;
+
+        case 1:
+            ////밑에 구역 혼자 배치
+            if(cache[firstCase][i + 1][0] == -1)
+                cache[firstCase][i + 1][0] = getSmallestUnitNum(firstCase, i + 1, 0);
+            ans = cache[firstCase][i + 1][0] + 1;
+
+            ////밑에 구역 우측이랑 이어서 배치
+            if(enemies[i].second + enemies[i + 1].second <= W){
+                if(cache[firstCase][i + 1][2] == -1)
+                    cache[firstCase][i + 1][2] = getSmallestUnitNum(firstCase, i + 1, 2);
+                if(ans > cache[firstCase][i + 1][2] + 1)
+                    ans = cache[firstCase][i + 1][2] + 1;
+            }
+
+            break;
+        
+        case 2:
+            ////위에 구역 혼자 배치
+            if(cache[firstCase][i + 1][0] == -1)
+                cache[firstCase][i + 1][0] = getSmallestUnitNum(firstCase, i + 1, 0);
+            ans = cache[firstCase][i + 1][0] + 1;
+
+            ////위에 구역 우측이랑 이어서 배치
+            if(enemies[i].first + enemies[i + 1].first <= W){
+                if(cache[firstCase][i + 1][1] == -1)
+                    cache[firstCase][i + 1][1] = getSmallestUnitNum(firstCase, i + 1, 1);
+                if(ans > cache[firstCase][i + 1][1] + 1)
+                    ans = cache[firstCase][i + 1][1] + 1;
+            }
+
+            break;
+
+        case 3:
+            if(cache[firstCase][i + 1][0] == -1)
+                cache[firstCase][i + 1][0] = getSmallestUnitNum(firstCase, i + 1, 0);
+            ans = cache[firstCase][i + 1][0];
+    }
+
+    return ans;
 }
