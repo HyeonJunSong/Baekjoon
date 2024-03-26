@@ -4,7 +4,7 @@
 
 using namespace std;
 
-#define NINF -987654321
+#define NINF -1000000001
 
 int main(){
   ios_base::sync_with_stdio(false);
