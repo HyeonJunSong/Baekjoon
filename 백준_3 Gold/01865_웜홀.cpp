@@ -1,87 +1,66 @@
 #include <iostream>
 #include <vector>
-#include <map>
-
-using namespace std;
-
-vector<map<int, int>> graph;
-int N, M, W;
-
-bool isNegativeCyclePossible(vector<int> wormWholeStart);
-bool findCycleDFS(int curNode, int weightByCur);
 
 #define INF 987654321
 
+using namespace std;
+
+void testCase(){
+
+    int N, M, W;
+    cin >> N >> M >> W;
+
+    int S, E, T;
+    vector<vector<pair<int, int>>> graph(N);
+    for(int i = 0; i < M; i++){
+        cin >> S >> E >> T;
+        S--; E--;
+        graph[S].emplace_back(E, T);
+        graph[E].emplace_back(S, T);
+    }
+    for(int i = 0; i < W; i++){
+        cin >> S >> E >> T;
+        S--; E--;
+        graph[S].emplace_back(E, -T);
+    }
+
+    vector<int> minDis(N, INF);
+    for(int i = 0; i < N - 1; i++){
+        vector<int> newMinDis = minDis;
+        for(int j = 0; j < N; j++)
+            for(auto e: graph[j])
+                newMinDis[e.first] = min(newMinDis[e.first], minDis[j] + e.second);
+        
+        minDis = newMinDis;
+    }
+
+    //음수 사이클 체크
+    bool ifNegExist = false;
+    for(int j = 0; j < N; j++){
+        for(auto e: graph[j]){
+            if(minDis[e.first] > minDis[j] + e.second){
+                ifNegExist = true;
+                break;
+            }
+        }
+    }
+
+    if(ifNegExist) cout << "YES\n";
+    else cout << "NO\n";
+
+}
+
 int main(){
+
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+
     int TC;
     cin >> TC;
 
-    int S, E, T;
-
-    for(int tc = 0; tc < TC; tc++){
-        cin >> N >> M >> W;
-        graph = vector<map<int, int>>(N + 1, map<int, int>());
-
-
-        for(int i = 0; i < M; i++){
-            cin >> S >> E >> T;
-            if(graph[S].find(E) == graph[S].end()) graph[S][E] = T;
-            else if(graph[S][E] > T) graph[S][E] = T;
-
-            if(graph[E].find(S) == graph[E].end()) graph[E][S] = T;
-            else if(graph[E][S] > T) graph[E][S] = T;
-        }
-
-        vector<int> wormHoleStart;
-        for(int i = 0; i < W; i++){
-            cin >> S >> E >> T;
-            if(graph[S].find(E) == graph[S].end()){
-                graph[S][E] = -1 * T;
-                wormHoleStart.push_back(S);
-            }
-            else if(graph[S][E] > -1 * T){
-                if(graph[S][E] > 0) wormHoleStart.push_back(S);
-                graph[S][E] = -1 * T;
-            }
-        }
-
-        if(isNegativeCyclePossible(wormHoleStart))
-            cout << "YES" << endl;
-        else
-            cout << "NO" << endl;
-    }
+    for(int i = 0; i < TC; i++)
+        testCase();
 
     return 0;
-}
-
-int st;
-vector<int> cache;
-
-bool isNegativeCyclePossible(vector<int> wormHoleStart){
-    for(auto i = 0; i < wormHoleStart.size(); i++){
-        st = wormHoleStart[i];
-        cache = vector<int>(N + 1, INF);
-        if(findCycleDFS(wormHoleStart[i], 0))
-            return true;
-    }
-    return false;
-}
-
-bool findCycleDFS(int curNode, int weightByCur){
-
-    if(curNode == st){
-        if(weightByCur < 0)
-            return true;
-        return false;
-    }
-
-    for(auto iter = graph[curNode].begin(); iter != graph[curNode].end(); iter++){
-        if(cache[iter->first] > weightByCur + iter->second){
-            cache[iter->first] = weightByCur + iter->second;
-            if(findCycleDFS(iter->first, weightByCur + iter->second))
-                return true;
-        }
-    }
-
-    return false;
 }
