@@ -1,64 +1,47 @@
 #include <iostream>
 #include <vector>
-#include <set>
 
 using namespace std;
 
-#define MAX 987654321
+int main(){
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
 
-vector<vector<int>> graph;
-vector<vector<int>> memo;
-
-int minDis(int st, int ed, set<int> fromNow);
-
-int main() {
 	int N, M;
 	cin >> N >> M;
-	graph = vector<vector<int>>(N, vector<int>());
-	memo = vector<vector<int>>(N, vector<int>(N, -1));
-	for (int i = 0; i < M; i++) {
-		int inp1, inp2;
-		cin >> inp1 >> inp2;
-		inp1--; inp2--;
-		graph[inp1].push_back(inp2);
-		graph[inp2].push_back(inp1);
-		memo[inp1][inp2] = 1;
-		memo[inp2][inp1] = 1;
+	vector<vector<int>> dis(N, vector<int>(N, 987654321));
+	for(int i = 0; i < M; i++){
+		int f1,f2;
+		cin >> f1 >> f2;
+		f1--; f2--;
+		dis[f1][f2] = 1;
+		dis[f2][f1] = 1;
 	}
 
-	int totMax = MAX;
-	int ans;
-	for (int i = 0; i < N; i++) {
-		int tot = 0;
-		for (int j = 0; j < N; j++) {
-			set<int> fromNow;
-			if (i == j) continue;
-			tot += minDis(i, j, fromNow);
-		}
-		if (totMax > tot) {
-			totMax = tot;
-			ans = i;
-		}
-	}
-	cout << ans + 1;
+	for(int i = 0; i < N; i++) dis[i][i] = 0;
+
+	for(int k = 0; k < N; k++)
+		for(int i = 0; i < N; i++)
+			for(int j = 0; j < N; j++)
+				dis[i][j] = min(dis[i][j], dis[i][k] + dis[k][j]);
 	
-	return 0;
-}
+	
+	int ans = -1;
+	int ansDis = 987654321;
+	for(int i = 0; i < N; i++){
 
-int minDis(int st, int ed, set<int> fromNow) {
-	fromNow.insert(st);
+		int curDisSum = 0;
+		for(int j = 0; j < N; j++)
+			curDisSum += dis[i][j];
+		
 
-	if (memo[st][ed] != -1) return memo[st][ed];
-
-	int min = MAX;
-	for (int i = 0; i < graph[st].size(); i++) {
-		if (fromNow.find(graph[st][i]) != fromNow.end()) continue;
-
-		int res;
-		if (memo[graph[st][i]][ed] == -1) res = minDis(graph[st][i], ed, fromNow);
-		else res = 1;
-		if (min > res) min = res;
+		if(ansDis > curDisSum){
+			ans = i;
+			ansDis = curDisSum;
+		}
 	}
 
-	return min + 1;
+	cout << ans + 1;
+
+	return 0;
 }
