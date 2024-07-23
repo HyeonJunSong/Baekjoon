@@ -1,0 +1,1 @@
+[print(["D", "C", "B", "A", "E"][sum(list(map(int, input().split())))]) for _ in range(3)]
