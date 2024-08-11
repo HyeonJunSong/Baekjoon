@@ -37,12 +37,11 @@ int main(){
       cin >> graph[i][j];
   }
   matched.assign(M + 1, -1);
-  visited.assign(M + 1, false);
 
   for(int i = 0; i < N; i++){
-    for(int j = 1; j <= M; j++) visited[j] = false;
+    visited.assign(M + 1, false);
     tryMatch(i);
-    for(int j = 1; j <= M; j++) visited[j] = false;
+    visited.assign(M + 1, false);
     tryMatch(i);
   }
 
