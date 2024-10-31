@@ -14,17 +14,18 @@ bool comp(pair<pair<int, int>, int> a, pair<pair<int, int>, int> b){
   return a.first.first < b.first.first;
 }
 
-int leafNum = 262144;
-vector<int> segTree(2 * leafNum, 0);
 
-void segUpdate(int idx, int val){
-  idx += leafNum;
+#define SQRT 320
+int len[SQRT * SQRT + 1] = {0};
+int lenSqrt[SQRT + 1] = {0};
 
-  segTree[idx] = val;
-  idx /= 2;
-  while(idx > 0){
-    segTree[idx] = max(segTree[2 * idx], segTree[2 * idx + 1]);
-    idx /= 2;
+int getAns(){
+  for(int i = SQRT - 1; i >= 0; i--){
+    if(lenSqrt[i] == 0) continue;
+    for(int j = SQRT - 1; j >= 0; j--){
+      if(len[SQRT * i + j] == 0) continue;
+      return SQRT * i + j;
+    }
   }
 }
 
@@ -51,50 +52,84 @@ int main(){
   bucketNum = (int)(sqrt(N));
   sort(queries.begin(), queries.end(), comp);
 
+
   vector<int> ans(M);
 
   vector<deque<int>> dqList(200001);
 
   for(int i = queries[0].first.first - 1; i <= queries[0].first.second; i++){
+    if(dqList[100000 + nums[i]].size() > 0){
+      len[dqList[100000 + nums[i]].back() - dqList[100000 + nums[i]].front()]--;
+      lenSqrt[(dqList[100000 + nums[i]].back() - dqList[100000 + nums[i]].front()) / SQRT]--;
+    }
+
     dqList[100000 + nums[i]].push_back(i);
-    segUpdate(100000 + nums[i], i - dqList[100000 + nums[i]].front());
+
+    len[i - dqList[100000 + nums[i]].front()]++;
+    lenSqrt[(i - dqList[100000 + nums[i]].front()) / SQRT]++;
   }
-  ans[queries[0].second] = segTree[1];
+  ans[queries[0].second] = getAns();
 
 
   for(int q = 1; q < M; q++){
 
     if(queries[q - 1].first.first > queries[q].first.first){
       for(int i = queries[q - 1].first.first - 2; i >= queries[q].first.first - 1; i--){
+
+        if(dqList[100000 + nums[i]].size() > 0){
+          len[dqList[100000 + nums[i]].back() - dqList[100000 + nums[i]].front()]--;
+          lenSqrt[(dqList[100000 + nums[i]].back() - dqList[100000 + nums[i]].front()) / SQRT]--;
+        }
+
         dqList[100000 + nums[i]].push_front(i);
-        segUpdate(100000 + nums[i], dqList[100000 + nums[i]].back() - i);
+        len[dqList[100000 + nums[i]].back() - dqList[100000 + nums[i]].front()]++;
+        lenSqrt[(dqList[100000 + nums[i]].back() - dqList[100000 + nums[i]].front()) / SQRT]++;
       }
     }
 
     if(queries[q - 1].first.second < queries[q].first.second){
       for(int i = queries[q - 1].first.second + 1; i <= queries[q].first.second; i++){
+        if(dqList[100000 + nums[i]].size() > 0){
+          len[dqList[100000 + nums[i]].back() - dqList[100000 + nums[i]].front()]--;
+          lenSqrt[(dqList[100000 + nums[i]].back() - dqList[100000 + nums[i]].front()) / SQRT]--;
+        }
+
         dqList[100000 + nums[i]].push_back(i);
-        segUpdate(100000 + nums[i], i - dqList[100000 + nums[i]].front());
+
+        len[dqList[100000 + nums[i]].back() - dqList[100000 + nums[i]].front()]++;
+        lenSqrt[(dqList[100000 + nums[i]].back() - dqList[100000 + nums[i]].front()) / SQRT]++;
       }
     }
 
     if(queries[q - 1].first.first < queries[q].first.first){
       for(int i = queries[q - 1].first.first - 1; i < queries[q].first.first - 1; i++){
+        len[dqList[100000 + nums[i]].back() - dqList[100000 + nums[i]].front()]--;
+        lenSqrt[(dqList[100000 + nums[i]].back() - dqList[100000 + nums[i]].front()) / SQRT]--;
+
         dqList[100000 + nums[i]].pop_front();
-        if(dqList[100000 + nums[i]].size() > 0)
-          segUpdate(100000 + nums[i], dqList[100000 + nums[i]].back() - dqList[100000 + nums[i]].front());
+
+        if(dqList[100000 + nums[i]].size() > 0){
+          len[dqList[100000 + nums[i]].back() - dqList[100000 + nums[i]].front()]++;
+          lenSqrt[(dqList[100000 + nums[i]].back() - dqList[100000 + nums[i]].front()) / SQRT]++;
+        }
       }
     }
 
     if(queries[q - 1].first.second > queries[q].first.second){
       for(int i = queries[q - 1].first.second; i > queries[q].first.second; i--){
+        len[dqList[100000 + nums[i]].back() - dqList[100000 + nums[i]].front()]--;
+        lenSqrt[(dqList[100000 + nums[i]].back() - dqList[100000 + nums[i]].front()) / SQRT]--;
+
         dqList[100000 + nums[i]].pop_back();
-        if(dqList[100000 + nums[i]].size() > 0)
-          segUpdate(100000 + nums[i], dqList[100000 + nums[i]].back() - dqList[100000 + nums[i]].front());
+
+        if(dqList[100000 + nums[i]].size() > 0){
+          len[dqList[100000 + nums[i]].back() - dqList[100000 + nums[i]].front()]++;
+          lenSqrt[(dqList[100000 + nums[i]].back() - dqList[100000 + nums[i]].front()) / SQRT]++;
+        }
       }
     }
 
-    ans[queries[q].second] = segTree[1];
+    ans[queries[q].second] = getAns();
   }
 
   for(auto e: ans)
