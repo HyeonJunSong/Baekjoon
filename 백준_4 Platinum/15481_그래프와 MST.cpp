@@ -111,7 +111,7 @@ int main(){
     graph[edges[i][2]].push_back({edges[i][1], edges[i][0]});
 
     unionGroup(edges[i][1], edges[i][2]);
-    mstWeight += (long long)edges[i][0];
+    mstWeight += edges[i][0];
   }
 
   dfs(1, 1, 1);
@@ -131,7 +131,7 @@ int main(){
       continue;
     }
 
-    ans[edges[i][3]] = mstWeight + (long long)edges[i][0] - (long long)lca(edges[i][1], edges[i][2]);
+    ans[edges[i][3]] = mstWeight + edges[i][0] - lca(edges[i][1], edges[i][2]);
   }
 
   for(auto e: ans)
