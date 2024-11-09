@@ -41,8 +41,8 @@ class Graph{
   int dfs(int cur, int curFlow){
     if(cur == snk) return curFlow;
 
-    for(int i = edgeIdx[cur]; i < graph[cur].size(); i++){
-      int nxt = graph[cur][i];
+    for(; edgeIdx[cur] < graph[cur].size(); edgeIdx[cur]++){
+      int nxt = graph[cur][edgeIdx[cur]];
       if(levelOf[nxt] - levelOf[cur] != 1) continue;
       if(capacity[cur][nxt] <= flow[cur][nxt]) continue;
       int nxtFlow = dfs(nxt, min(curFlow, capacity[cur][nxt] - flow[cur][nxt]));
