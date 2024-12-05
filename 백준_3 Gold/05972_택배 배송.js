@@ -15,30 +15,19 @@ class PQ {
   pop() {
     const top = this.list[1];
     let idx = 1;
-    while (2 * idx < this.list.length) {
-      if (this.comp(this.list[2 * idx], this.list[2 * idx + 1])) {
-        [this.list[idx], this.list[2 * idx + 1]] = [this.list[2 * idx + 1], this.list[idx]];
-        idx = 2 * idx + 1;
-      } else {
-        [this.list[idx], this.list[2 * idx]] = [this.list[2 * idx], this.list[idx]];
-        idx = 2 * idx;
-      }
-    }
-
-    [this.list[idx], this.list[this.list.length - 1]] = [
-      this.list[this.list.length - 1],
-      this.list[idx],
-    ];
+    this.list[1] = this.list[this.list.length - 1];
     this.list.pop();
 
-    while (idx > 1) {
-      if (this.comp(this.list[parseInt(idx / 2)], this.list[idx])) {
-        [this.list[parseInt(idx / 2)], this.list[idx]] = [
-          this.list[idx],
-          this.list[parseInt(idx / 2)],
-        ];
+    while (2 * idx < this.list.length) {
+      if (this.comp(this.list[2 * idx], this.list[2 * idx + 1])) {
+        if (this.comp(this.list[idx], this.list[2 * idx + 1]))
+          [this.list[idx], this.list[2 * idx + 1]] = [this.list[2 * idx + 1], this.list[idx]];
+        idx = 2 * idx + 1;
+      } else {
+        if (this.comp(this.list[idx], this.list[2 * idx]))
+          [this.list[idx], this.list[2 * idx]] = [this.list[2 * idx], this.list[idx]];
+        idx = 2 * idx;
       }
-      idx = parseInt(idx / 2);
     }
 
     return top;
