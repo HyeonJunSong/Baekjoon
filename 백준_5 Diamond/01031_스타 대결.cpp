@@ -107,9 +107,13 @@ int main(){
     return 0;
   }
 
+  // i -> j 대체 경로 확인 
   for(int i = 0; i < N; i++){
     for(int j = 0; j < M; j++){
+
+      //현재 우선순위 고정을 위해 capacity를 0으로
       cap[i][N + j] = 0;
+
       if(flw[i][N + j] == 0) continue;
       for(int k = 0; k < VNUM; k++) edgeIdx[k] = 0;
 
